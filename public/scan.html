@@ -7,9 +7,9 @@
 <title>Scan Ticket</title>
 
 <style>
+
 body{
-background:#0f0c29;
-background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+background: linear-gradient(135deg,#0f0c29,#302b63,#24243e);
 height:100vh;
 display:flex;
 justify-content:center;
@@ -57,13 +57,10 @@ font-weight:bold;
 cursor:pointer;
 }
 
-button:hover{
-opacity:0.9;
-}
-
 #reader{
 margin-top:20px;
 }
+
 </style>
 
 </head>
@@ -102,32 +99,51 @@ qrbox:250
 
 let ticketId = qrText;
 
-if(qrText.includes("ticketId=")){
-ticketId = qrText.split("ticketId=")[1];
+// extract id from URL
+if(qrText.includes("id=")){
+ticketId = qrText.split("id=")[1];
 }
 
+// remove extra params if any
+if(ticketId.includes("&")){
+ticketId = ticketId.split("&")[0];
+}
+
+console.log("Scanned Ticket ID:", ticketId);
+
 fetch("/verify-ticket",{
+
 method:"POST",
+
 headers:{
 "Content-Type":"application/json"
 },
+
 body:JSON.stringify({
-ticketId:ticketId
+ticketId: ticketId
 })
+
 })
+
 .then(res=>res.json())
 .then(data=>{
 
 if(data.status==="valid"){
-alert("Entry Allowed : "+data.name)
+
+alert("✅ Entry Allowed: " + data.name)
+
 }
 
 else if(data.status==="already_used"){
-alert("Ticket already used")
+
+alert("⚠ Ticket Already Used")
+
 }
 
 else{
-alert("Invalid ticket")
+
+alert("❌ Invalid Ticket")
+
 }
 
 })
