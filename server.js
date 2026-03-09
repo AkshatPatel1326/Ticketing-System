@@ -3,7 +3,7 @@ const path = require("path");
 const admin = require("firebase-admin");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
@@ -12,8 +12,8 @@ let serviceAccount;
 
 try {
   serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-} catch (err) {
-  console.error("Firebase service account not loaded");
+} catch (error) {
+  console.error("Failed to parse Firebase credentials:", error);
 }
 
 admin.initializeApp({
@@ -24,6 +24,7 @@ const db = admin.firestore();
 
 app.post("/register", async (req, res) => {
   try {
+
     const { name, phone } = req.body;
 
     if (!name || !phone) {
@@ -33,7 +34,7 @@ app.post("/register", async (req, res) => {
     const ticketId =
       "FEST-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-    await db.collection("registrations").add({
+    await db.collection("tickets").add({
       name,
       phone,
       ticketId,
@@ -46,12 +47,12 @@ app.post("/register", async (req, res) => {
       ticketId
     });
 
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Firebase error:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
 
 app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
+  console.log(`Server running on port ${PORT}`);
 });
