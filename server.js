@@ -6,179 +6,183 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(express.static(path.join(__dirname, "public")));
 
-// ================= FIREBASE =================
+
+// ================= FIREBASE INIT =================
 
 let serviceAccount;
 
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 } else {
-serviceAccount = require("./firebase-service-account.json");
+  serviceAccount = require("./firebase-service-account.json");
 }
 
 admin.initializeApp({
-credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount)
 });
 
 const db = admin.firestore();
 
+
 // ================= PAGE ROUTES =================
 
-// Home
 app.get("/", (req, res) => {
-res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Register
 app.get("/register", (req, res) => {
-res.sendFile(path.join(__dirname, "public", "register.html"));
+  res.sendFile(path.join(__dirname, "public", "register.html"));
 });
 
-// Admin Login
 app.get("/admin", (req, res) => {
-res.sendFile(path.join(__dirname, "public", "admin-login.html"));
+  res.sendFile(path.join(__dirname, "public", "admin-login.html"));
 });
 
-// Admin Dashboard
 app.get("/admin/dashboard", (req, res) => {
-res.sendFile(path.join(__dirname, "public", "admin-dashboard.html"));
+  res.sendFile(path.join(__dirname, "public", "admin-dashboard.html"));
 });
 
-// Scanner
 app.get("/scan", (req, res) => {
-res.sendFile(path.join(__dirname, "public", "scan.html"));
+  res.sendFile(path.join(__dirname, "public", "scan.html"));
 });
 
-// Ticket
 app.get("/ticket", (req, res) => {
-res.sendFile(path.join(__dirname, "public", "ticket.html"));
+  res.sendFile(path.join(__dirname, "public", "ticket.html"));
 });
 
-// ================= REGISTER API =================
+
+// ================= REGISTER =================
 
 app.post("/register", async (req, res) => {
 
-try {
+  try {
 
-```
-const { name, phone } = req.body;
+    const { name, phone } = req.body;
 
-if (!name || !phone) {
-  return res.status(400).json({ error: "Missing name or phone" });
-}
+    if (!name || !phone) {
+      return res.status(400).json({
+        error: "Name and phone required"
+      });
+    }
 
-const ticketId =
-  "FEST-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const ticketId =
+      "FEST-" + Math.random().toString(36).substring(2,8).toUpperCase();
 
-await db.collection("tickets").doc(ticketId).set({
-  name,
-  phone,
-  ticketId,
-  used: false,
-  createdAt: new Date()
-});
+    await db.collection("tickets").doc(ticketId).set({
+      name,
+      phone,
+      ticketId,
+      used: false,
+      createdAt: new Date()
+    });
 
-res.json({
-  success: true,
-  ticketId
-});
-```
+    res.json({
+      success: true,
+      ticketId: ticketId
+    });
 
-} catch (error) {
+  } catch (err) {
 
-```
-console.error(error);
+    console.error(err);
 
-res.status(500).json({
-  error: "Server error"
-});
-```
+    res.status(500).json({
+      error: "Server error"
+    });
 
-}
+  }
 
 });
 
-// ================= VERIFY QR =================
+
+// ================= VERIFY TICKET =================
 
 app.post("/verify-ticket", async (req, res) => {
 
-try {
+  try {
 
-```
-const { ticketId } = req.body;
+    const { ticketId } = req.body;
 
-const ref = db.collection("tickets").doc(ticketId);
-const doc = await ref.get();
+    const ref = db.collection("tickets").doc(ticketId);
+    const doc = await ref.get();
 
-if (!doc.exists) {
-  return res.json({ status: "invalid" });
-}
+    if (!doc.exists) {
+      return res.json({ status: "invalid" });
+    }
 
-const data = doc.data();
+    const data = doc.data();
 
-if (data.used) {
-  return res.json({ status: "already_used" });
-}
+    if (data.used) {
+      return res.json({ status: "already_used" });
+    }
 
-await ref.update({ used: true });
+    await ref.update({
+      used: true
+    });
 
-res.json({
-  status: "valid",
-  name: data.name
+    res.json({
+      status: "valid",
+      name: data.name
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: "Verification failed"
+    });
+
+  }
+
 });
-```
 
-} catch (error) {
-
-```
-console.error(error);
-
-res.status(500).json({ error: "Server error" });
-```
-
-}
-
-});
 
 // ================= ADMIN STATS =================
 
 app.get("/stats", async (req, res) => {
 
-try {
+  try {
 
-```
-const snapshot = await db.collection("tickets").get();
+    const snapshot = await db.collection("tickets").get();
 
-let total = snapshot.size;
-let entered = 0;
+    let total = snapshot.size;
+    let entered = 0;
 
-snapshot.forEach(doc => {
-  if (doc.data().used) entered++;
+    snapshot.forEach(doc => {
+
+      if (doc.data().used === true) {
+        entered++;
+      }
+
+    });
+
+    res.json({
+      total,
+      entered,
+      remaining: total - entered
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: "Failed to fetch stats"
+    });
+
+  }
+
 });
 
-res.json({
-  total,
-  entered,
-  remaining: total - entered
-});
-```
-
-} catch (error) {
-
-```
-console.error(error);
-
-res.status(500).json({ error: "Server error" });
-```
-
-}
-
-});
 
 // ================= START SERVER =================
 
 app.listen(PORT, () => {
-console.log("Server running on port " + PORT);
+
+  console.log("Server running on port " + PORT);
+
 });
