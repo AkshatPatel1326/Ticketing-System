@@ -1,41 +1,68 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const path = require("path");
-const cors = require("cors");
-
-const ticketRoutes = require("./routes/ticketRoutes");
+const admin = require("firebase-admin");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Middlewares
-app.use(cors());
-app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static("public"));
 
-// Serve static files
-app.use(express.static(path.join(__dirname, "public")));
+/* FIREBASE INIT */
 
-// API routes
-app.use("/api", ticketRoutes);
+const serviceAccount = require("./firebase-service-account.json");
 
-// Main dashboard (Register / Scanner / Admin)
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public/index.html"));
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
 });
 
-// Admin login page
-app.get("/admin", (req, res) => {
-    res.sendFile(path.join(__dirname, "public/admin-login.html"));
+const db = admin.firestore();
+
+
+/* REGISTER API */
+
+app.post("/register", async (req, res) => {
+
+    try {
+
+        const { name, phone } = req.body;
+
+        if (!name || !phone) {
+            return res.status(400).json({
+                error: "Missing fields"
+            });
+        }
+
+        const ticketId = "FEST-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+        await db.collection("tickets").doc(ticketId).set({
+            name,
+            phone,
+            ticketId,
+            used: false,
+            createdAt: new Date()
+        });
+
+        return res.json({
+            message: "Registration successful",
+            ticketId: ticketId
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            error: "Server error"
+        });
+
+    }
+
 });
 
-// Admin dashboard page
-app.get("/admin/dashboard", (req, res) => {
-    res.sendFile(path.join(__dirname, "public/admin-dashboard.html"));
-});
 
-// Start server
-const PORT = 3000;
+/* START SERVER */
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log("Server running on port " + PORT);
 });
