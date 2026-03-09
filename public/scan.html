@@ -1,3 +1,86 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scan Ticket</title>
+
+<style>
+body{
+background:#0f0c29;
+background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+font-family:Arial;
+}
+
+.card{
+width:420px;
+background:#0c0c0c;
+border-radius:18px;
+padding:40px;
+text-align:center;
+
+border:2px solid transparent;
+
+background-image:
+linear-gradient(#0c0c0c,#0c0c0c),
+linear-gradient(120deg,#00ffe7,#7dff8f,#ffc8ff);
+
+background-origin:border-box;
+background-clip:padding-box,border-box;
+
+box-shadow:0 0 25px rgba(0,255,200,0.3);
+}
+
+h1{
+color:#00ffe7;
+margin-bottom:10px;
+}
+
+p{
+color:#bbb;
+margin-bottom:20px;
+}
+
+button{
+width:100%;
+padding:14px;
+background:#00ffe7;
+border:none;
+border-radius:8px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+opacity:0.9;
+}
+
+#reader{
+margin-top:20px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>Scan Ticket</h1>
+<p>Scan QR code to verify entry</p>
+
+<div id="reader"></div>
+
+<button onclick="startScanner()">Start Scanner</button>
+
+</div>
+
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
@@ -17,7 +100,6 @@ qrbox:250
 
 (qrText)=>{
 
-// extract ticket id if url
 let ticketId = qrText;
 
 if(qrText.includes("ticketId=")){
@@ -25,39 +107,27 @@ ticketId = qrText.split("ticketId=")[1];
 }
 
 fetch("/verify-ticket",{
-
 method:"POST",
-
 headers:{
 "Content-Type":"application/json"
 },
-
 body:JSON.stringify({
-ticketId: ticketId
+ticketId:ticketId
 })
-
 })
-
 .then(res=>res.json())
-
 .then(data=>{
 
 if(data.status==="valid"){
-
-alert("✅ Entry Allowed : " + data.name)
-
+alert("Entry Allowed : "+data.name)
 }
 
 else if(data.status==="already_used"){
-
-alert("⚠ Ticket Already Used")
-
+alert("Ticket already used")
 }
 
 else{
-
-alert("❌ Invalid Ticket")
-
+alert("Invalid ticket")
 }
 
 })
@@ -69,3 +139,6 @@ alert("❌ Invalid Ticket")
 }
 
 </script>
+
+</body>
+</html>
