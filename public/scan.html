@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scan Ticket</title>
 
-<style>
+<script src="https://unpkg.com/html5-qrcode"></script>
 
+<style>
 body{
-background: linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
 height:100vh;
 display:flex;
 justify-content:center;
@@ -23,44 +23,9 @@ background:#0c0c0c;
 border-radius:18px;
 padding:40px;
 text-align:center;
-
-border:2px solid transparent;
-
-background-image:
-linear-gradient(#0c0c0c,#0c0c0c),
-linear-gradient(120deg,#00ffe7,#7dff8f,#ffc8ff);
-
-background-origin:border-box;
-background-clip:padding-box,border-box;
-
-box-shadow:0 0 25px rgba(0,255,200,0.3);
 }
 
-h1{
-color:#00ffe7;
-margin-bottom:10px;
-}
-
-p{
-color:#bbb;
-margin-bottom:20px;
-}
-
-button{
-width:100%;
-padding:14px;
-background:#00ffe7;
-border:none;
-border-radius:8px;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-}
-
-#reader{
-margin-top:20px;
-}
-
+#reader{margin-top:20px;}
 </style>
 
 </head>
@@ -69,8 +34,7 @@ margin-top:20px;
 
 <div class="card">
 
-<h1>Scan Ticket</h1>
-<p>Scan QR code to verify entry</p>
+<h2 style="color:#00ffe7">Scan Ticket</h2>
 
 <div id="reader"></div>
 
@@ -78,38 +42,24 @@ margin-top:20px;
 
 </div>
 
-<script src="https://unpkg.com/html5-qrcode"></script>
-
 <script>
-
-let scanner;
 
 function startScanner(){
 
-scanner = new Html5Qrcode("reader");
+const scanner = new Html5Qrcode("reader");
 
 scanner.start(
-{ facingMode: "environment" },
-{
-fps:10,
-qrbox:250
-},
+{ facingMode:"environment" },
+{ fps:10, qrbox:250 },
 
 (qrText)=>{
 
-let ticketId = qrText;
+let ticketId = qrText.trim();
 
-// extract id from URL
-if(qrText.includes("id=")){
-ticketId = qrText.split("id=")[1];
+// if QR accidentally contains URL
+if(ticketId.includes("id=")){
+ticketId = ticketId.split("id=")[1];
 }
-
-// remove extra params if any
-if(ticketId.includes("&")){
-ticketId = ticketId.split("&")[0];
-}
-
-console.log("Scanned Ticket ID:", ticketId);
 
 fetch("/verify-ticket",{
 
@@ -119,31 +69,22 @@ headers:{
 "Content-Type":"application/json"
 },
 
-body:JSON.stringify({
-ticketId: ticketId
-})
+body:JSON.stringify({ticketId})
 
 })
-
-.then(res=>res.json())
+.then(r=>r.json())
 .then(data=>{
 
 if(data.status==="valid"){
-
-alert("✅ Entry Allowed: " + data.name)
-
+alert("Entry Allowed: "+data.name)
 }
 
 else if(data.status==="already_used"){
-
-alert("⚠ Ticket Already Used")
-
+alert("Ticket Already Used")
 }
 
 else{
-
-alert("❌ Invalid Ticket")
-
+alert("Invalid Ticket")
 }
 
 })
