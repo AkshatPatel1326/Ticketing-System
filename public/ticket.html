@@ -1,55 +1,134 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<title>Ticket</title>
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>College Fest Ticket</title>
 
 <style>
+
 body{
-background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+margin:0;
 height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-font-family:Arial;
+font-family:Arial, sans-serif;
+
+background:linear-gradient(135deg,#1a1a40,#3c2f70,#6b4fa3);
 }
 
-.card{
-width:420px;
-background:#0c0c0c;
-border-radius:18px;
+.ticket{
+
+background:black;
 padding:40px;
+border-radius:20px;
+
+width:350px;
 text-align:center;
-border:2px solid transparent;
 
-background-image:
-linear-gradient(#0c0c0c,#0c0c0c),
-linear-gradient(120deg,#00ffe7,#7dff8f,#ffc8ff);
+box-shadow:0 0 20px rgba(0,255,255,0.4);
 
-background-origin:border-box;
-background-clip:padding-box,border-box;
+border:2px solid #00ffff;
+
 }
 
-h1{color:#00ffe7;}
+.title{
 
-#qrcode{
-margin-top:20px;
+color:#00ffff;
+font-size:30px;
+font-weight:bold;
+margin-bottom:20px;
+
 }
+
+.ticketid{
+
+color:white;
+font-size:18px;
+margin-bottom:20px;
+
+}
+
+.qr{
+
+background:white;
+padding:15px;
+border-radius:12px;
+
+display:inline-block;
+
+margin-bottom:20px;
+
+}
+
+.qr img{
+
+width:200px;
+height:200px;
+
+image-rendering:pixelated;
+
+}
+
+.note{
+
+color:#ccc;
+margin-bottom:20px;
+
+}
+
+.download{
+
+background:#49c6d9;
+border:none;
+
+padding:14px 25px;
+font-size:16px;
+
+border-radius:10px;
+
+cursor:pointer;
+font-weight:bold;
+
+}
+
+.download:hover{
+
+background:#37a7b9;
+
+}
+
 </style>
 
 </head>
 
 <body>
 
-<div class="card">
+<div class="ticket">
 
-<h1>COLLEGE FEST</h1>
+<div class="title">
+COLLEGE FEST
+</div>
 
-<h3 id="ticketId"></h3>
+<div id="ticketId" class="ticketid">
+Ticket ID
+</div>
 
-<canvas id="qrcode"></canvas>
+<div class="qr">
+<img id="qrImage">
+</div>
+
+<div class="note">
+Show this QR at entry gate
+</div>
+
+<button class="download" onclick="downloadTicket()">
+Download Ticket
+</button>
 
 </div>
 
@@ -61,13 +140,33 @@ const ticketId = params.get("id");
 document.getElementById("ticketId").innerText =
 "Ticket ID: " + ticketId;
 
-// IMPORTANT: QR contains ONLY ticketId
-QRCode.toCanvas(
-document.getElementById("qrcode"),
-ticketId
-);
+const qrUrl =
+"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="
++ encodeURIComponent(ticketId);
+
+document.getElementById("qrImage").src = qrUrl;
+
+
+function downloadTicket(){
+
+html2canvas(document.querySelector(".ticket"))
+.then(canvas=>{
+
+const link=document.createElement("a");
+
+link.download="ticket.png";
+
+link.href=canvas.toDataURL();
+
+link.click();
+
+});
+
+}
 
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 </body>
 </html>
