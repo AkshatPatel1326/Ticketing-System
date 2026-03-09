@@ -10,179 +10,203 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, "public")));
 
-
 // ================= FIREBASE INIT =================
 
 let serviceAccount;
 
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 } else {
-  serviceAccount = require("./firebase-service-account.json");
+serviceAccount = require("./firebase-service-account.json");
 }
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+credential: admin.credential.cert(serviceAccount)
 });
 
 const db = admin.firestore();
 
-
 // ================= PAGE ROUTES =================
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.get("/register", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "register.html"));
+res.sendFile(path.join(__dirname, "public", "register.html"));
 });
 
 app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "admin-login.html"));
+res.sendFile(path.join(__dirname, "public", "admin-login.html"));
 });
 
 app.get("/admin/dashboard", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "admin-dashboard.html"));
+res.sendFile(path.join(__dirname, "public", "admin-dashboard.html"));
 });
 
 app.get("/scan", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "scan.html"));
+res.sendFile(path.join(__dirname, "public", "scan.html"));
 });
 
 app.get("/ticket", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "ticket.html"));
+res.sendFile(path.join(__dirname, "public", "ticket.html"));
 });
-
 
 // ================= REGISTER =================
 
 app.post("/register", async (req, res) => {
 
-  try {
+try {
 
-    const { name, phone } = req.body;
+```
+const { name, phone } = req.body;
 
-    if (!name || !phone) {
-      return res.status(400).json({
-        error: "Name and phone required"
-      });
-    }
+if (!name || !phone) {
+  return res.status(400).json({
+    error: "Name and phone required"
+  });
+}
 
-    const ticketId =
-      "FEST-" + Math.random().toString(36).substring(2,8).toUpperCase();
+const ticketId =
+  "FEST-" + Math.random().toString(36).substring(2,8).toUpperCase();
 
-    await db.collection("tickets").doc(ticketId).set({
-      name,
-      phone,
-      ticketId,
-      used: false,
-      createdAt: new Date()
-    });
+await db.collection("tickets").doc(ticketId).set({
+  name,
+  phone,
+  ticketId,
+  used: false,
+  createdAt: new Date()
+});
 
-    res.json({
-      success: true,
-      ticketId: ticketId
-    });
+res.json({
+  success: true,
+  ticketId: ticketId
+});
+```
 
-  } catch (err) {
+} catch (err) {
 
-    console.error(err);
+```
+console.error(err);
 
-    res.status(500).json({
-      error: "Server error"
-    });
+res.status(500).json({
+  error: "Server error"
+});
+```
 
-  }
+}
 
 });
 
-
-// ================= VERIFY TICKET =================
+// ================= VERIFY TICKET (UPDATED) =================
 
 app.post("/verify-ticket", async (req, res) => {
 
-  try {
+try {
 
-    const { ticketId } = req.body;
+```
+let { ticketId } = req.body;
 
-    const ref = db.collection("tickets").doc(ticketId);
-    const doc = await ref.get();
+if (!ticketId) {
+  return res.json({ status: "invalid" });
+}
 
-    if (!doc.exists) {
-      return res.json({ status: "invalid" });
-    }
+// If QR contains URL, extract the ID
+if (ticketId.includes("id=")) {
+  ticketId = ticketId.split("id=")[1];
+}
 
-    const data = doc.data();
+// Remove extra params if present
+if (ticketId.includes("&")) {
+  ticketId = ticketId.split("&")[0];
+}
 
-    if (data.used) {
-      return res.json({ status: "already_used" });
-    }
+ticketId = ticketId.trim();
 
-    await ref.update({
-      used: true
-    });
+console.log("Verifying Ticket:", ticketId);
 
-    res.json({
-      status: "valid",
-      name: data.name
-    });
+const ref = db.collection("tickets").doc(ticketId);
+const doc = await ref.get();
 
-  } catch (err) {
+if (!doc.exists) {
+  return res.json({ status: "invalid" });
+}
 
-    console.error(err);
+const data = doc.data();
 
-    res.status(500).json({
-      error: "Verification failed"
-    });
+if (data.used === true) {
+  return res.json({ status: "already_used" });
+}
 
-  }
-
+await ref.update({
+  used: true
 });
 
+res.json({
+  status: "valid",
+  name: data.name
+});
+```
+
+} catch (err) {
+
+```
+console.error("Verification error:", err);
+
+res.status(500).json({
+  status: "error"
+});
+```
+
+}
+
+});
 
 // ================= ADMIN STATS =================
 
 app.get("/stats", async (req, res) => {
 
-  try {
+try {
 
-    const snapshot = await db.collection("tickets").get();
+```
+const snapshot = await db.collection("tickets").get();
 
-    let total = snapshot.size;
-    let entered = 0;
+let total = snapshot.size;
+let entered = 0;
 
-    snapshot.forEach(doc => {
+snapshot.forEach(doc => {
 
-      if (doc.data().used === true) {
-        entered++;
-      }
-
-    });
-
-    res.json({
-      total,
-      entered,
-      remaining: total - entered
-    });
-
-  } catch (err) {
-
-    console.error(err);
-
-    res.status(500).json({
-      error: "Failed to fetch stats"
-    });
-
+  if (doc.data().used === true) {
+    entered++;
   }
 
 });
 
+res.json({
+  total,
+  entered,
+  remaining: total - entered
+});
+```
+
+} catch (err) {
+
+```
+console.error(err);
+
+res.status(500).json({
+  error: "Failed to fetch stats"
+});
+```
+
+}
+
+});
 
 // ================= START SERVER =================
 
 app.listen(PORT, () => {
 
-  console.log("Server running on port " + PORT);
+console.log("Server running on port " + PORT);
 
 });
