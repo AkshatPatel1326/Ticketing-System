@@ -1,39 +1,155 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Fest Registration</title>
+<title>College Fest Registration</title>
 
-    <link rel="stylesheet" href="css/style.css">
+<style>
 
+body{
+    margin:0;
+    font-family: Arial, Helvetica, sans-serif;
+
+    background:
+    radial-gradient(circle at 20% 20%, rgba(255,100,200,0.15), transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(100,200,255,0.15), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(120,255,200,0.15), transparent 40%),
+    linear-gradient(135deg,#020617,#0f172a,#020617);
+
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.card{
+    width:380px;
+    background:#000;
+    padding:35px;
+    border-radius:20px;
+
+    border:2px solid transparent;
+    background-image:
+    linear-gradient(#000,#000),
+    linear-gradient(90deg,#22fff0,#ff4ecd,#ffd166);
+
+    background-origin:border-box;
+    background-clip:padding-box,border-box;
+
+    text-align:center;
+
+    box-shadow:0 0 40px rgba(0,255,255,0.2);
+}
+
+h1{
+    margin:0;
+    font-size:32px;
+    color:#2cf7d5;
+}
+
+.subtitle{
+    color:#aaa;
+    margin-bottom:25px;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    margin:10px 0;
+    border:none;
+    border-radius:8px;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:15px;
+}
+
+input:focus{
+    outline:none;
+    background:#222;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    margin-top:15px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:bold;
+    background:#18e0b8;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+</style>
 </head>
+
 
 <body>
 
-    <div class="container">
+<div class="card">
 
-        <div class="ticket-card">
+<h1>COLLEGE FEST</h1>
+<div class="subtitle">Register for Entry Pass</div>
 
-            <div class="title">COLLEGE FEST</div>
-            <div class="subtitle">Register for Entry Pass</div>
+<input type="text" id="name" placeholder="Enter Name" required>
+<input type="tel" id="phone" placeholder="Enter Phone Number" required>
 
-            <form id="form">
+<button onclick="registerUser()">Register</button>
 
-                <input type="text" id="name" placeholder="Enter Name" required>
+</div>
 
-                <input type="text" id="phone" placeholder="Enter Phone Number" required>
 
-                <button type="submit">Register</button>
+<script>
 
-            </form>
+async function registerUser(){
 
-        </div>
+    const name = document.getElementById("name").value;
+    const phone = document.getElementById("phone").value;
 
-    </div>
+    if(!name || !phone){
+        alert("Please fill all fields");
+        return;
+    }
 
-    <script src="js/register.js"></script>
+    try{
+
+        const response = await fetch("/register",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({name,phone})
+        });
+
+        const result = await response.json();
+
+        if(response.ok){
+
+            alert(result.message || "Registration successful!");
+
+            window.location.href = "/ticket.html?id=" + result.ticketId;
+
+        }else{
+
+            alert(result.error || "Registration failed");
+
+        }
+
+    }catch(error){
+
+        alert("Server error. Please try again.");
+
+    }
+
+}
+
+</script>
 
 </body>
-
 </html>
