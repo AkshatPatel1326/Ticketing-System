@@ -1,69 +1,73 @@
 <!DOCTYPE html>
+
 <html>
-
 <head>
+<meta charset="UTF-8">
+<title>Ticket</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
-    <title>Fest Ticket</title>
+<style>
+body{
+background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+font-family:Arial;
+}
 
-    <link rel="stylesheet" href="css/style.css">
+.card{
+width:420px;
+background:#0c0c0c;
+border-radius:18px;
+padding:40px;
+text-align:center;
+border:2px solid transparent;
 
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+background-image:
+linear-gradient(#0c0c0c,#0c0c0c),
+linear-gradient(120deg,#00ffe7,#7dff8f,#ffc8ff);
+
+background-origin:border-box;
+background-clip:padding-box,border-box;
+}
+
+h1{color:#00ffe7;}
+
+#qrcode{
+margin-top:20px;
+}
+</style>
 
 </head>
 
 <body>
 
-    <div class="container">
+<div class="card">
 
-        <div class="ticket-card" id="ticketCard">
+<h1>COLLEGE FEST</h1>
 
-            <div class="title">COLLEGE FEST</div>
-            <div class="subtitle">Annual Cultural Festival</div>
+<h3 id="ticketId"></h3>
 
-            <div class="info">📅 Date: 9 & 10 April 2026</div>
-            <div class="info">📍 Venue: Sage University Indore</div>
+<canvas id="qrcode"></canvas>
 
-            <p class="ticket-id" id="ticketID"></p>
+</div>
 
-            <div class="qr-box">
-                <canvas id="qr"></canvas>
-            </div>
+<script>
 
-            <div class="info">Show this QR at entry gate</div>
+const params = new URLSearchParams(window.location.search);
+const ticketId = params.get("id");
 
-            <button onclick="downloadTicket()">Download Ticket</button>
+document.getElementById("ticketId").innerText =
+"Ticket ID: " + ticketId;
 
-        </div>
+// IMPORTANT: QR contains ONLY ticketId
+QRCode.toCanvas(
+document.getElementById("qrcode"),
+ticketId
+);
 
-    </div>
-
-    <script>
-
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get("id");
-
-        document.getElementById("ticketID").innerText = "Ticket ID: " + id;
-
-        const verifyURL = `${window.location.origin}/api/verify/${id}`;
-
-        QRCode.toCanvas(document.getElementById('qr'), verifyURL);
-
-        function downloadTicket() {
-
-            html2canvas(document.getElementById("ticketCard")).then(canvas => {
-
-                let link = document.createElement("a");
-                link.download = "fest-ticket.png";
-                link.href = canvas.toDataURL();
-                link.click();
-
-            });
-
-        }
-
-    </script>
+</script>
 
 </body>
-
 </html>
