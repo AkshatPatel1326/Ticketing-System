@@ -75,7 +75,7 @@ await db.collection("tickets").doc(ticketId).set({
   phone,
   ticketId,
   used: false,
-  createdAt: new Date()
+  createdAt: admin.firestore.FieldValue.serverTimestamp()
 });
 
 res.json({
@@ -210,3 +210,4 @@ app.listen(PORT, () => {
 console.log("Server running on port " + PORT);
 
 });
+
