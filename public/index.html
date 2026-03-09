@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Fest Control Panel</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="ticket-card">
+
+            <div class="title">COLLEGE FEST</div>
+            <div class="subtitle">Control Panel</div>
+
+            <button onclick="openRegister()">Register</button>
+
+            <div id="staffOptions" style="display:none">
+
+                <button onclick="openScanner()">Gate Scanner</button>
+
+                <button onclick="openAdmin()">Admin Dashboard</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const params = new URLSearchParams(window.location.search);
+        const isStaff = params.get("staff");
+
+        if (isStaff === "true") {
+            document.getElementById("staffOptions").style.display = "block";
+        }
+
+        function openRegister() {
+
+            window.location.href = "/register.html";
+
+        }
+
+        function openScanner() {
+
+            window.location.href = "/fast-scan.html";
+
+        }
+
+        function openAdmin() {
+
+            window.location.href = "/admin";
+
+        }
+
+    </script>
+
+</body>
+
+</html>

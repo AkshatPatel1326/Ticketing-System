@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Admin Login</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="ticket-card">
+
+            <div class="title">Admin Panel</div>
+            <div class="subtitle">Fest Management Access</div>
+
+            <input type="password" id="password" placeholder="Enter Admin Password">
+
+            <button onclick="login()">Login</button>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        function login() {
+
+            const pass = document.getElementById("password").value;
+
+            if (pass === "festadmin123") {
+
+                window.location.href = "/admin/dashboard";
+
+            } else {
+
+                alert("Wrong password");
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>

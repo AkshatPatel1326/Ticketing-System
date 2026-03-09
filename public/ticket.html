@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Fest Ticket</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="ticket-card" id="ticketCard">
+
+            <div class="title">COLLEGE FEST</div>
+            <div class="subtitle">Annual Cultural Festival</div>
+
+            <div class="info">📅 Date: 9 & 10 April 2026</div>
+            <div class="info">📍 Venue: Sage University Indore</div>
+
+            <p class="ticket-id" id="ticketID"></p>
+
+            <div class="qr-box">
+                <canvas id="qr"></canvas>
+            </div>
+
+            <div class="info">Show this QR at entry gate</div>
+
+            <button onclick="downloadTicket()">Download Ticket</button>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+
+        document.getElementById("ticketID").innerText = "Ticket ID: " + id;
+
+        const verifyURL = `${window.location.origin}/api/verify/${id}`;
+
+        QRCode.toCanvas(document.getElementById('qr'), verifyURL);
+
+        function downloadTicket() {
+
+            html2canvas(document.getElementById("ticketCard")).then(canvas => {
+
+                let link = document.createElement("a");
+                link.download = "fest-ticket.png";
+                link.href = canvas.toDataURL();
+                link.click();
+
+            });
+
+        }
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Gate Scanner</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        /* Scanner container */
+        #reader {
+            width: 300px;
+            margin: auto;
+            margin-top: 20px;
+        }
+
+        /* Flash screen for results */
+        .flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+            z-index: 999;
+        }
+
+        .valid {
+            background: green;
+        }
+
+        .used {
+            background: orange;
+        }
+
+        .invalid {
+            background: red;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="ticket-card">
+
+            <div class="title">Gate Scanner</div>
+            <div class="subtitle">Scan QR for Entry Verification</div>
+
+            <div id="reader"></div>
+
+        </div>
+
+    </div>
+
+    <div id="flash" style="display:none"></div>
+
+    <script src="js/fastScanner.js"></script>
+
+</body>
+
+</html>

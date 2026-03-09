@@ -1,0 +1,145 @@
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+
+    /* Dark Night Background */
+    background: linear-gradient(135deg, #0b0c1c, #020617);
+}
+
+/* Aurora Glow Left */
+body::before {
+    content: "";
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    top: -150px;
+    left: -150px;
+    background: #a78bfa;
+    filter: blur(180px);
+    opacity: 0.35;
+    z-index: 0;
+}
+
+/* Aurora Glow Right */
+body::after {
+    content: "";
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    bottom: -200px;
+    right: -150px;
+    background: #67e8f9;
+    filter: blur(180px);
+    opacity: 0.35;
+    z-index: 0;
+}
+
+/* Center container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
+/* Neon card */
+.ticket-card {
+    background: #000000d9;
+    width: 380px;
+    padding: 35px;
+    border-radius: 16px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 0 25px rgba(0, 255, 195, 0.25);
+}
+
+/* Neon border */
+.ticket-card::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 18px;
+    padding: 2px;
+    background: linear-gradient(45deg, #67e8f9, #a78bfa, #f9a8d4);
+
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Title */
+.title {
+    font-size: 36px;
+    font-weight: bold;
+    color: #67e8f9;
+}
+
+/* Subtitle */
+.subtitle {
+    color: #cbd5f5;
+    margin-bottom: 20px;
+}
+
+/* Inputs */
+input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #1e293b;
+    color: white;
+    font-size: 14px;
+}
+
+/* Buttons */
+button {
+    margin-top: 15px;
+    padding: 12px;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    background: #67e8f9;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+button:hover {
+    background: #38bdf8;
+}
+
+/* Info text */
+.info {
+    font-size: 15px;
+    margin-top: 5px;
+    color: #cbd5f5;
+}
+
+/* QR box */
+.qr-box {
+    background: white;
+    padding: 12px;
+    display: inline-block;
+    border-radius: 10px;
+    margin: 25px 0;
+}
+
+/* Ticket ID */
+.ticket-id {
+    margin-top: 15px;
+    font-size: 18px;
+}

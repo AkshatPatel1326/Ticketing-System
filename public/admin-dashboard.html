@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="ticket-card">
+
+            <div class="title">Admin Dashboard</div>
+            <div class="subtitle">Fest Entry Monitoring</div>
+
+            <div class="info" id="total">Total Registered: 0</div>
+            <div class="info" id="entered">Total Entered: 0</div>
+            <div class="info" id="remaining">Remaining: 0</div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        async function loadStats() {
+
+            const res = await fetch("/api/stats");
+            const data = await res.json();
+
+            document.getElementById("total").innerText =
+                "Total Registered: " + data.total;
+
+            document.getElementById("entered").innerText =
+                "Total Entered: " + data.entered;
+
+            document.getElementById("remaining").innerText =
+                "Remaining: " + (data.total - data.entered);
+
+        }
+
+        // Load stats automatically
+        loadStats();
+
+    </script>
+
+</body>
+
+</html>

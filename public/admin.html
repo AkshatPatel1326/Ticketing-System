@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Admin Dashboard</title>
+</head>
+
+<body>
+
+    <h1>Fest Entry Dashboard</h1>
+
+    <h2 id="total"></h2>
+    <h2 id="entered"></h2>
+    <h2 id="remaining"></h2>
+
+    <script>
+
+        async function loadStats() {
+
+            const res = await fetch("/api/stats");
+            const data = await res.json();
+
+            document.getElementById("total").innerText =
+                "Total Registered: " + data.total;
+
+            document.getElementById("entered").innerText =
+                "Total Entered: " + data.entered;
+
+            document.getElementById("remaining").innerText =
+                "Remaining: " + (data.total - data.entered);
+
+        }
+
+        loadStats();
+
+    </script>
+
+</body>
+
+</html>
