@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 10000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// ================= FIREBASE INIT =================
+// ================= FIREBASE =================
 
 let serviceAccount;
 
@@ -31,27 +31,27 @@ app.get("/", (req, res) => {
 res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Register Page
+// Register
 app.get("/register", (req, res) => {
 res.sendFile(path.join(__dirname, "public", "register.html"));
 });
 
-// Admin Login Page
+// Admin Login
 app.get("/admin", (req, res) => {
 res.sendFile(path.join(__dirname, "public", "admin-login.html"));
 });
 
 // Admin Dashboard
-app.get("/dashboard", (req, res) => {
+app.get("/admin/dashboard", (req, res) => {
 res.sendFile(path.join(__dirname, "public", "admin-dashboard.html"));
 });
 
-// Scanner Page
+// Scanner
 app.get("/scan", (req, res) => {
 res.sendFile(path.join(__dirname, "public", "scan.html"));
 });
 
-// Ticket Page
+// Ticket
 app.get("/ticket", (req, res) => {
 res.sendFile(path.join(__dirname, "public", "ticket.html"));
 });
@@ -82,7 +82,7 @@ await db.collection("tickets").doc(ticketId).set({
 
 res.json({
   success: true,
-  ticketId: ticketId
+  ticketId
 });
 ```
 
@@ -92,7 +92,7 @@ res.json({
 console.error(error);
 
 res.status(500).json({
-  error: "Server error. Please try again."
+  error: "Server error"
 });
 ```
 
@@ -100,7 +100,7 @@ res.status(500).json({
 
 });
 
-// ================= VERIFY QR (SCANNER) =================
+// ================= VERIFY QR =================
 
 app.post("/verify-ticket", async (req, res) => {
 
@@ -159,8 +159,8 @@ snapshot.forEach(doc => {
 });
 
 res.json({
-  total: total,
-  entered: entered,
+  total,
+  entered,
   remaining: total - entered
 });
 ```
@@ -177,7 +177,7 @@ res.status(500).json({ error: "Server error" });
 
 });
 
-// ================= SERVER START =================
+// ================= START SERVER =================
 
 app.listen(PORT, () => {
 console.log("Server running on port " + PORT);
