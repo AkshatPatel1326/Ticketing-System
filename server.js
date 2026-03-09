@@ -14,6 +14,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 let serviceAccount;
 
+try {
+
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
 serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 } else {
@@ -23,6 +25,14 @@ serviceAccount = require("./firebase-service-account.json");
 admin.initializeApp({
 credential: admin.credential.cert(serviceAccount)
 });
+
+console.log("Firebase initialized");
+
+} catch (err) {
+
+console.error("Firebase init error:", err);
+
+}
 
 const db = admin.firestore();
 
@@ -58,105 +68,97 @@ app.post("/register", async (req, res) => {
 
 try {
 
-```
 const { name, phone } = req.body;
 
 if (!name || !phone) {
-  return res.status(400).json({
-    error: "Name and phone required"
-  });
+return res.status(400).json({
+error: "Name and phone required"
+});
 }
 
 const ticketId =
-  "FEST-" + Math.random().toString(36).substring(2,8).toUpperCase();
+"FEST-" + Math.random().toString(36).substring(2,8).toUpperCase();
 
 await db.collection("tickets").doc(ticketId).set({
-  name,
-  phone,
-  ticketId,
-  used: false,
-  createdAt: admin.firestore.FieldValue.serverTimestamp()
+
+name: name,
+phone: phone,
+ticketId: ticketId,
+used: false,
+
+// SAFE FIRESTORE TIMESTAMP
+createdAt: admin.firestore.FieldValue.serverTimestamp()
+
 });
 
 res.json({
-  success: true,
-  ticketId: ticketId
+success: true,
+ticketId: ticketId
 });
-```
 
 } catch (err) {
 
-```
-console.error(err);
+console.error("REGISTER ERROR:", err);
 
 res.status(500).json({
-  error: "Server error"
+error: "Server error"
 });
-```
 
 }
 
 });
 
-// ================= VERIFY TICKET (UPDATED) =================
+// ================= VERIFY TICKET =================
 
 app.post("/verify-ticket", async (req, res) => {
 
 try {
 
-```
 let { ticketId } = req.body;
 
 if (!ticketId) {
-  return res.json({ status: "invalid" });
+return res.json({ status: "invalid" });
 }
 
-// If QR contains URL, extract the ID
 if (ticketId.includes("id=")) {
-  ticketId = ticketId.split("id=")[1];
+ticketId = ticketId.split("id=")[1];
 }
 
-// Remove extra params if present
 if (ticketId.includes("&")) {
-  ticketId = ticketId.split("&")[0];
+ticketId = ticketId.split("&")[0];
 }
 
 ticketId = ticketId.trim();
 
-console.log("Verifying Ticket:", ticketId);
+console.log("Verifying:", ticketId);
 
 const ref = db.collection("tickets").doc(ticketId);
 const doc = await ref.get();
 
 if (!doc.exists) {
-  return res.json({ status: "invalid" });
+return res.json({ status: "invalid" });
 }
 
 const data = doc.data();
 
 if (data.used === true) {
-  return res.json({ status: "already_used" });
+return res.json({ status: "already_used" });
 }
 
-await ref.update({
-  used: true
-});
+await ref.update({ used: true });
 
 res.json({
-  status: "valid",
-  name: data.name
+status: "valid",
+name: data.name
 });
-```
 
 } catch (err) {
 
-```
-console.error("Verification error:", err);
+console.error("VERIFY ERROR:", err);
 
 res.status(500).json({
-  status: "error"
+status: "error"
 });
-```
 
 }
 
@@ -168,7 +170,6 @@ app.get("/stats", async (req, res) => {
 
 try {
 
-```
 const snapshot = await db.collection("tickets").get();
 
 let total = snapshot.size;
@@ -176,28 +177,25 @@ let entered = 0;
 
 snapshot.forEach(doc => {
 
-  if (doc.data().used === true) {
-    entered++;
-  }
+if (doc.data().used === true) {
+entered++;
+}
 
 });
 
 res.json({
-  total,
-  entered,
-  remaining: total - entered
+total,
+entered,
+remaining: total - entered
 });
-```
 
 } catch (err) {
 
-```
-console.error(err);
+console.error("STATS ERROR:", err);
 
 res.status(500).json({
-  error: "Failed to fetch stats"
+error: "Failed to fetch stats"
 });
-```
 
 }
 
@@ -207,7 +205,6 @@ res.status(500).json({
 
 app.listen(PORT, () => {
 
-console.log("Server running on port " + PORT);
+console.log("Server running on port", PORT);
 
 });
-
