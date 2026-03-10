@@ -1,29 +1,42 @@
-const statusText = document.getElementById("status");
+let html5QrCode;
 
-const scanner = new Html5Qrcode("reader");
+const statusText = document.getElementById("status");
 
 function startScanner(){
 
-scanner.start(
+statusText.innerText="Starting camera...";
+
+html5QrCode = new Html5Qrcode("reader");
+
+Html5Qrcode.getCameras().then(cameras => {
+
+if(cameras && cameras.length){
+
+const backCamera = cameras.find(cam =>
+cam.label.toLowerCase().includes("back")
+);
+
+const cameraId = backCamera ? backCamera.id : cameras[0].id;
+
+html5QrCode.start(
+
+cameraId,
 
 {
-facingMode: { exact: "environment" }   // forces rear camera
-},
-
-{
-fps: 10,
-
-qrbox: { width: 250, height: 250 }
-
+fps:10,
+qrbox:{width:250,height:250}
 },
 
 onScanSuccess
 
-).catch(err=>{
+);
 
-console.log("Camera error:",err);
+}
 
-statusText.innerText="Camera access failed";
+}).catch(err => {
+
+console.log(err);
+statusText.innerText="Camera permission denied";
 
 });
 
@@ -54,7 +67,6 @@ ticketId:decodedText
 if(data.status==="valid"){
 
 statusText.innerHTML="✅ Entry Allowed";
-
 statusText.style.color="lightgreen";
 
 }
@@ -62,7 +74,6 @@ statusText.style.color="lightgreen";
 else if(data.status==="already_used"){
 
 statusText.innerHTML="⚠ Ticket Already Used";
-
 statusText.style.color="orange";
 
 }
@@ -70,7 +81,6 @@ statusText.style.color="orange";
 else{
 
 statusText.innerHTML="❌ Invalid Ticket";
-
 statusText.style.color="red";
 
 }
@@ -78,5 +88,3 @@ statusText.style.color="red";
 });
 
 }
-
-startScanner();
