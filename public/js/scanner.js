@@ -46,6 +46,20 @@ function onScanSuccess(decodedText){
 
 statusText.innerText="Checking ticket...";
 
+// -------- HANDLE NORMAL PHONE CAMERA QR --------
+// If QR contains URL like ticket.html?id=FEST-XXXXX
+let ticketId = decodedText;
+
+if(decodedText.includes("id=")){
+ticketId = decodedText.split("id=")[1];
+}
+
+if(ticketId.includes("&")){
+ticketId = ticketId.split("&")[0];
+}
+
+ticketId = ticketId.trim();
+
 fetch("/verify-ticket",{
 
 method:"POST",
@@ -55,7 +69,7 @@ headers:{
 },
 
 body:JSON.stringify({
-ticketId:decodedText
+ticketId:ticketId
 })
 
 })
@@ -66,24 +80,40 @@ ticketId:decodedText
 
 if(data.status==="valid"){
 
-statusText.innerHTML="✅ Entry Allowed";
-statusText.style.color="lightgreen";
+statusText.innerHTML="✅ ENTRY ALLOWED";
+statusText.style.color="white";
+
+document.body.style.background="green";
 
 }
 
 else if(data.status==="already_used"){
 
-statusText.innerHTML="⚠ Ticket Already Used";
-statusText.style.color="orange";
+statusText.innerHTML="⚠ TICKET ALREADY USED";
+statusText.style.color="white";
+
+document.body.style.background="orange";
 
 }
 
 else{
 
-statusText.innerHTML="❌ Invalid Ticket";
-statusText.style.color="red";
+statusText.innerHTML="❌ INVALID TICKET";
+statusText.style.color="white";
+
+document.body.style.background="red";
 
 }
+
+})
+
+.catch(err=>{
+
+console.log(err);
+
+statusText.innerHTML="Server error";
+
+document.body.style.background="red";
 
 });
 
