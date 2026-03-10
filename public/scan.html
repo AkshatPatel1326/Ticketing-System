@@ -1,56 +1,64 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Scan Ticket</title>
 
-<script src="https://unpkg.com/html5-qrcode"></script>
-
 <style>
+
 body{
-background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+margin:0;
 height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
+
 font-family:Arial;
+
+background:linear-gradient(135deg,#1a1a40,#3c2f70,#6b4fa3);
 }
 
-.card{
-width:420px;
-background:#0c0c0c;
-border-radius:18px;
-padding:40px;
+.container{
+
+background:black;
+padding:30px;
+
+border-radius:20px;
+
+width:350px;
 text-align:center;
+
+border:2px solid #00ffff;
+
+box-shadow:0 0 20px rgba(0,255,255,0.4);
+
 }
 
-#reader{margin-top:20px;}
+h2{
+color:#00ffff;
+margin-bottom:20px;
+}
 
-/* ===== RESULT SCREEN ===== */
+#reader{
 
-.result{
-position:fixed;
-top:0;
-left:0;
 width:100%;
-height:100%;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:45px;
+border-radius:10px;
+
+overflow:hidden;
+
+}
+
+.status{
+
+margin-top:15px;
 font-weight:bold;
 color:white;
-z-index:999;
-opacity:0;
-transition:0.3s;
+
 }
-
-.green{background:#00c853;}
-.orange{background:#ff9100;}
-.red{background:#ff1744;}
-
-.show{opacity:1;}
 
 </style>
 
@@ -58,108 +66,107 @@ transition:0.3s;
 
 <body>
 
-<div class="card">
+<div class="container">
 
-<h2 style="color:#00ffe7">Scan Ticket</h2>
+<h2>Scan Ticket</h2>
 
 <div id="reader"></div>
 
-<button onclick="startScanner()">Start Scanner</button>
+<div id="status" class="status">
+Waiting for QR scan...
+</div>
 
 </div>
 
-<!-- RESULT SCREEN -->
+<script src="https://unpkg.com/html5-qrcode"></script>
 
-<div id="resultScreen" class="result"></div>
+<script src="js/scanner.js"></script>
 
-<!-- BEEP SOUND -->
+</body>
+</html>
+<!DOCTYPE html>
 
-<audio id="beep">
-<source src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg">
-</audio>
+<html lang="en">
+<head>
 
-<script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-let scanner;
+<title>Scan Ticket</title>
 
-const resultScreen = document.getElementById("resultScreen");
+<style>
 
-function showResult(text,color){
+body{
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
 
-resultScreen.className="result "+color+" show";
+font-family:Arial;
 
-resultScreen.innerText=text;
+background:linear-gradient(135deg,#1a1a40,#3c2f70,#6b4fa3);
+}
 
-setTimeout(()=>{
-resultScreen.className="result";
-},1500);
+.container{
+
+background:black;
+padding:30px;
+
+border-radius:20px;
+
+width:350px;
+text-align:center;
+
+border:2px solid #00ffff;
+
+box-shadow:0 0 20px rgba(0,255,255,0.4);
 
 }
 
-function startScanner(){
-
-scanner = new Html5Qrcode("reader");
-
-scanner.start(
-{ facingMode:"environment" },
-{ fps:15, qrbox:250 },
-
-(qrText)=>{
-
-let ticketId = qrText.trim();
-
-// if QR accidentally contains URL
-if(ticketId.includes("id=")){
-ticketId = ticketId.split("id=")[1];
+h2{
+color:#00ffff;
+margin-bottom:20px;
 }
 
-fetch("/verify-ticket",{
+#reader{
 
-method:"POST",
+width:100%;
+border-radius:10px;
 
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({ticketId})
-
-})
-.then(r=>r.json())
-.then(data=>{
-
-if(data.status==="valid"){
-
-document.getElementById("beep").play();
-
-showResult("ENTRY OK","green");
+overflow:hidden;
 
 }
 
-else if(data.status==="already_used"){
+.status{
 
-showResult("ALREADY USED","orange");
-
-}
-
-else{
-
-showResult("INVALID TICKET","red");
+margin-top:15px;
+font-weight:bold;
+color:white;
 
 }
 
-setTimeout(()=>{
-scanner.resume();
-},1500);
+</style>
 
-})
+</head>
 
-}
+<body>
 
-)
+<div class="container">
 
-}
+<h2>Scan Ticket</h2>
 
-</script>
+<div id="reader"></div>
+
+<div id="status" class="status">
+Waiting for QR scan...
+</div>
+
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script src="js/scanner.js"></script>
 
 </body>
 </html>
