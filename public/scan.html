@@ -2,10 +2,8 @@
 
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Scan Ticket</title>
 
 <style>
@@ -16,26 +14,18 @@ height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-
 font-family:Arial;
-
 background:linear-gradient(135deg,#1a1a40,#3c2f70,#6b4fa3);
 }
 
 .container{
-
 background:black;
 padding:30px;
-
 border-radius:20px;
-
-width:350px;
+width:360px;
 text-align:center;
-
 border:2px solid #00ffff;
-
 box-shadow:0 0 20px rgba(0,255,255,0.4);
-
 }
 
 h2{
@@ -44,20 +34,28 @@ margin-bottom:20px;
 }
 
 #reader{
-
 width:100%;
+margin-top:15px;
+}
+
+button{
+padding:12px 20px;
+font-size:16px;
+border:none;
 border-radius:10px;
+background:#49c6d9;
+cursor:pointer;
+font-weight:bold;
+}
 
-overflow:hidden;
-
+button:hover{
+background:#37a7b9;
 }
 
 .status{
-
 margin-top:15px;
 font-weight:bold;
 color:white;
-
 }
 
 </style>
@@ -70,96 +68,12 @@ color:white;
 
 <h2>Scan Ticket</h2>
 
-<div id="reader"></div>
-
-<div id="status" class="status">
-Waiting for QR scan...
-</div>
-
-</div>
-
-<script src="https://unpkg.com/html5-qrcode"></script>
-
-<script src="js/scanner.js"></script>
-
-</body>
-</html>
-<!DOCTYPE html>
-
-<html lang="en">
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Scan Ticket</title>
-
-<style>
-
-body{
-margin:0;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-
-font-family:Arial;
-
-background:linear-gradient(135deg,#1a1a40,#3c2f70,#6b4fa3);
-}
-
-.container{
-
-background:black;
-padding:30px;
-
-border-radius:20px;
-
-width:350px;
-text-align:center;
-
-border:2px solid #00ffff;
-
-box-shadow:0 0 20px rgba(0,255,255,0.4);
-
-}
-
-h2{
-color:#00ffff;
-margin-bottom:20px;
-}
-
-#reader{
-
-width:100%;
-border-radius:10px;
-
-overflow:hidden;
-
-}
-
-.status{
-
-margin-top:15px;
-font-weight:bold;
-color:white;
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="container">
-
-<h2>Scan Ticket</h2>
+<button onclick="startScanner()">Start Scanner</button>
 
 <div id="reader"></div>
 
 <div id="status" class="status">
-Waiting for QR scan...
+Waiting to start scanner...
 </div>
 
 </div>
