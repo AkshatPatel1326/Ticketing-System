@@ -43,8 +43,13 @@ font-size:18px;
 margin-bottom:15px;
 }
 
+/* FIXED QR ALIGNMENT */
+
 #qrcode{
-margin:15px auto;
+margin:20px auto;
+display:flex;
+justify-content:center;
+align-items:center;
 }
 
 button{
@@ -102,7 +107,7 @@ ticketID = pathParts[pathParts.length - 1];
 document.getElementById("ticketId").innerText = ticketID;
 
 
-/* GENERATE QR (ONLY TICKET ID - IMPORTANT) */
+/* GENERATE QR */
 
 new QRCode(document.getElementById("qrcode"),{
 text: ticketID,
