@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>College Fest Ticket</title>
 
 <link rel="stylesheet" href="/css/style.css">
@@ -11,38 +12,57 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
+
 body{
     display:flex;
     justify-content:center;
     align-items:center;
     height:100vh;
     background:#0b0f1a;
-    font-family:Arial;
+    font-family:Arial, Helvetica, sans-serif;
 }
 
 .ticket-card{
-    width:300px;
-    padding:20px;
+    width:320px;
+    padding:25px;
     text-align:center;
-    border-radius:15px;
-    background:#111827;
+    border-radius:20px;
+    background:linear-gradient(135deg,#7f7fd5,#86a8e7,#91eae4);
     color:white;
-    border:2px solid #0ff;
+}
+
+.ticket-title{
+    font-size:26px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.ticket-id{
+    font-size:18px;
+    margin-bottom:15px;
 }
 
 #qrcode{
-    margin:20px auto;
+    margin:15px auto;
+}
+
+#qrcode img{
+    width:150px;
+    height:150px;
 }
 
 button{
-    padding:10px 20px;
+    margin-top:20px;
+    padding:12px 20px;
     border:none;
-    background:#00e6e6;
+    background:#00c9a7;
     color:black;
     font-weight:bold;
-    border-radius:8px;
+    border-radius:10px;
     cursor:pointer;
+    width:100%;
 }
+
 </style>
 
 </head>
@@ -51,40 +71,55 @@ button{
 
 <div class="ticket-card" id="ticket">
 
-<h2>COLLEGE FEST</h2>
+<div class="ticket-title">
+COLLEGE FEST
+</div>
 
-<p>Ticket ID: <span id="ticketId"></span></p>
+<div class="ticket-id">
+Ticket ID: <span id="ticketId"></span>
+</div>
 
 <div id="qrcode"></div>
 
 <p>Show this QR at entry gate</p>
 
-<button onclick="downloadTicket()">Download Ticket</button>
+<button onclick="downloadTicket()">
+Download Ticket
+</button>
 
 </div>
 
 <script>
 
-const params = new URLSearchParams(window.location.search);
-const ticketID = params.get("ticket");
+/* ---------------- GET TICKET ID ---------------- */
 
+const urlParams = new URLSearchParams(window.location.search);
+let ticketID = urlParams.get("ticketID") || urlParams.get("id");
+
+/* fallback if route style is /ticket/TICKETID */
+if(!ticketID){
+    const pathParts = window.location.pathname.split("/");
+    ticketID = pathParts[pathParts.length - 1];
+}
+
+/* show ticket id on page */
 document.getElementById("ticketId").innerText = ticketID;
 
 
-// Generate QR
-const qr = new QRCode(document.getElementById("qrcode"), {
+/* ---------------- GENERATE QR ---------------- */
+
+new QRCode(document.getElementById("qrcode"),{
     text: window.location.origin + "/verify/" + ticketID,
-    width: 180,
-    height: 180
+    width:150,
+    height:150
 });
 
 
-// DOWNLOAD FUNCTION (FIXED)
+/* ---------------- DOWNLOAD TICKET ---------------- */
 
 async function downloadTicket(){
 
     const ticket = document.getElementById("ticket");
-
     const qrCanvas = document.querySelector("#qrcode canvas");
 
     if(qrCanvas){
@@ -92,12 +127,9 @@ async function downloadTicket(){
         const img = document.createElement("img");
         img.src = qrCanvas.toDataURL("image/png");
 
-        img.width = qrCanvas.width;
-        img.height = qrCanvas.height;
-
         const qrContainer = document.getElementById("qrcode");
 
-        qrContainer.innerHTML = "";
+        qrContainer.innerHTML="";
         qrContainer.appendChild(img);
     }
 
@@ -106,9 +138,9 @@ async function downloadTicket(){
         useCORS:true
     });
 
-    const link = document.createElement("a");
-    link.download = "ticket.png";
-    link.href = canvas.toDataURL("image/png");
+    const link=document.createElement("a");
+    link.download="ticket.png";
+    link.href=canvas.toDataURL("image/png");
     link.click();
 
 }
