@@ -1,172 +1,119 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>College Fest Ticket</title>
 
+<link rel="stylesheet" href="/css/style.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <style>
-
 body{
-margin:0;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-font-family:Arial, sans-serif;
-
-background:linear-gradient(135deg,#1a1a40,#3c2f70,#6b4fa3);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    background:#0b0f1a;
+    font-family:Arial;
 }
 
-.ticket{
-
-background:black;
-padding:40px;
-border-radius:20px;
-
-width:350px;
-text-align:center;
-
-box-shadow:0 0 20px rgba(0,255,255,0.4);
-
-border:2px solid #00ffff;
-
+.ticket-card{
+    width:300px;
+    padding:20px;
+    text-align:center;
+    border-radius:15px;
+    background:#111827;
+    color:white;
+    border:2px solid #0ff;
 }
 
-.title{
-
-color:#00ffff;
-font-size:30px;
-font-weight:bold;
-margin-bottom:20px;
-
+#qrcode{
+    margin:20px auto;
 }
 
-.ticketid{
-
-color:white;
-font-size:18px;
-margin-bottom:20px;
-
+button{
+    padding:10px 20px;
+    border:none;
+    background:#00e6e6;
+    color:black;
+    font-weight:bold;
+    border-radius:8px;
+    cursor:pointer;
 }
-
-.qr{
-
-background:white;
-padding:15px;
-border-radius:12px;
-
-display:inline-block;
-
-margin-bottom:20px;
-
-}
-
-.qr img{
-
-width:200px;
-height:200px;
-
-image-rendering:pixelated;
-
-}
-
-.note{
-
-color:#ccc;
-margin-bottom:20px;
-
-}
-
-.download{
-
-background:#49c6d9;
-border:none;
-
-padding:14px 25px;
-font-size:16px;
-
-border-radius:10px;
-
-cursor:pointer;
-font-weight:bold;
-
-}
-
-.download:hover{
-
-background:#37a7b9;
-
-}
-
 </style>
 
 </head>
 
 <body>
 
-<div class="ticket">
+<div class="ticket-card" id="ticket">
 
-<div class="title">
-COLLEGE FEST
-</div>
+<h2>COLLEGE FEST</h2>
 
-<div id="ticketId" class="ticketid">
-Ticket ID
-</div>
+<p>Ticket ID: <span id="ticketId"></span></p>
 
-<div class="qr">
-<img id="qrImage">
-</div>
+<div id="qrcode"></div>
 
-<div class="note">
-Show this QR at entry gate
-</div>
+<p>Show this QR at entry gate</p>
 
-<button class="download" onclick="downloadTicket()">
-Download Ticket
-</button>
+<button onclick="downloadTicket()">Download Ticket</button>
 
 </div>
 
 <script>
 
 const params = new URLSearchParams(window.location.search);
-const ticketId = params.get("id");
+const ticketID = params.get("ticket");
 
-document.getElementById("ticketId").innerText =
-"Ticket ID: " + ticketId;
-
-const qrUrl =
-"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="
-+ encodeURIComponent(ticketId);
-
-document.getElementById("qrImage").src = qrUrl;
+document.getElementById("ticketId").innerText = ticketID;
 
 
-function downloadTicket(){
-
-html2canvas(document.querySelector(".ticket"))
-.then(canvas=>{
-
-const link=document.createElement("a");
-
-link.download="ticket.png";
-
-link.href=canvas.toDataURL();
-
-link.click();
-
+// Generate QR
+const qr = new QRCode(document.getElementById("qrcode"), {
+    text: window.location.origin + "/verify/" + ticketID,
+    width: 180,
+    height: 180
 });
+
+
+// DOWNLOAD FUNCTION (FIXED)
+
+async function downloadTicket(){
+
+    const ticket = document.getElementById("ticket");
+
+    const qrCanvas = document.querySelector("#qrcode canvas");
+
+    if(qrCanvas){
+
+        const img = document.createElement("img");
+        img.src = qrCanvas.toDataURL("image/png");
+
+        img.width = qrCanvas.width;
+        img.height = qrCanvas.height;
+
+        const qrContainer = document.getElementById("qrcode");
+
+        qrContainer.innerHTML = "";
+        qrContainer.appendChild(img);
+    }
+
+    const canvas = await html2canvas(ticket,{
+        scale:3,
+        useCORS:true
+    });
+
+    const link = document.createElement("a");
+    link.download = "ticket.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
 
 }
 
 </script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 </body>
 </html>
