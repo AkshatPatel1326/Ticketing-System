@@ -13,7 +13,7 @@ function showFlash(type, text) {
 
         flash.style.display = "none";
 
-    }, 1500);
+    }, 5000);
 
 }
 
@@ -59,5 +59,6 @@ let scanner = new Html5QrcodeScanner(
     "reader",
     { fps: 10, qrbox: 250 }
 );
+
 
 scanner.render(onScanSuccess);
