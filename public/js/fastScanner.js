@@ -13,7 +13,7 @@ function showFlash(type, text) {
 
         flash.style.display = "none";
 
-    }, 5000);
+    }, 10000);
 
 }
 
